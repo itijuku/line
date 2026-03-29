@@ -63,7 +63,10 @@ export async function POST(req: NextRequest) {
     const nowUnix = Date.now();
 
     if (nowUnix - lastUnix < 10000) {
-      console.log(`直近の議論から ${nowUnix - lastUnix}ms。は避けるべきであります。`);
+      await client.replyMessage(texts?.at(-1)?.replyToken || "", {
+          type: 'text',
+          text: `直近の議論から ${nowUnix - lastUnix}ms。は避けるべきであります。`
+      });
       yn = false;
     }
   }
