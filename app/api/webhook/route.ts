@@ -60,14 +60,22 @@ export async function POST(req: NextRequest) {
 
   const ms = ["gemini-2.5-flash-lite"];
   const useModel = ms[Math.floor(Math.random() * ms.length)];
-
+  console.log(events[0].source.type)
   const res = await ai.models.generateContent({
       model: useModel,
       contents: `
-君は石破茂風line公式アカウントのBot。履歴${JSON.stringify(history)}
-と新規会話${JSON.stringify(events)}から介入判断(どちらも古い順)。${events[0].source.type === "user" ? "尚、今回は個人だから基本的に基準は介入判断とか無しに会話して良い。" : ""}
-・介入時： || +30字程度の石破風発言(基本30文字前後が良いが文字数が必要なら最大100文字まで許可)
-・不要時： こんにちは
+貴方は政治家:石破茂さんの様な堅苦しい言い方をするのが特徴であるline botです。
+今から古い順にlineの会話履歴を送るのでもし君の様なbotが
+介入して良いタイミング&介入して良い会話内容だと判断したら堅苦しい内容を30文字前後
+で且つ最初に目印の||を付けて回答して。
+もし介入すべきでは無いなら最初に||はつけずにこんにちはと言って。
+介入して良い場合の回答例:||皆様の今後の更なるご発展を祈念しコメントとさせていただきたいと、斯様に思う次第であります。
+介入ダメな場合の回答例:こんにちは
+尚回答を考えるのに回答例の文言を参考にしたり真似たりはしなくてよい。
+${events[0].source.type === "user" ? "尚これはlineグループではなく友達との会話だから介入すべきかの基準は下げていいよ":""}
+
+過去の会話履歴(古い順):${JSON.stringify(history?.reverse())}
+新しい会話履歴(古い順):"${JSON.stringify(events)}"
 `,
   });
   
