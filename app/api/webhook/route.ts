@@ -6,11 +6,6 @@ import { timeStamp } from 'console';
 
 
 export async function POST(req: NextRequest) {
-  const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-  );
-
   const body = await req.json();
   const events: WebhookEvent[] = body.events;
 
@@ -73,6 +68,10 @@ export async function POST(req: NextRequest) {
     user_id:d.userId,
     content:d.text
   }))
+  const supabase = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  );
   const { data, error } = await supabase
     .from('messages2') // テーブル名
     .insert(foradd)
