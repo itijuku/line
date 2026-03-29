@@ -54,24 +54,24 @@ export async function POST(req: NextRequest) {
     .order('created_at', { ascending: false })
     .limit(10);
 
-  let yn = true;
+  // let yn = true;
 
-  if (history && (history as any[]).length > 0) {
-    const lastCreatedAt = (history as any[])[0].created_at;
+  // if (history && (history as any[]).length > 0) {
+  //   const lastCreatedAt = (history as any[])[0].created_at;
     
-    const lastUnix = new Date(lastCreatedAt).getTime();
-    const nowUnix = Date.now();
+  //   const lastUnix = new Date(lastCreatedAt).getTime();
+  //   const nowUnix = Date.now();
 
-    if (nowUnix - lastUnix < 10000) {
-      yn = false;
-      await client.replyMessage(texts?.at(-1)?.replyToken || "", {
-          type: 'text',
-          text: `直近の議論から ${nowUnix - lastUnix}ms。は避けるべきであります。`
-      });
-    }
-  }
+  //   if (nowUnix - lastUnix < 10000) {
+  //     yn = false;
+  //     await client.replyMessage(texts?.at(-1)?.replyToken || "", {
+  //         type: 'text',
+  //         text: `直近の議論から ${nowUnix - lastUnix}ms。は避けるべきであります。`
+  //     });
+  //   }
+  // }
 
-  if(yn){
+  if(1){
     const ai = new GoogleGenAI({
       apiKey:process.env.GEMINI_API_KEY || ""
     });
