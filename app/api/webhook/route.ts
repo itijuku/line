@@ -58,7 +58,7 @@ export async function POST(req: NextRequest) {
     apiKey:process.env.GEMINI_API_KEY || ""
   });
 
-  const ms = ["gemini-2.5-flash","gemini-2.5-flash-lite"];
+  const ms = ["gemini-2.0-flash","gemini-2.0-flash-lite"];
   const useModel = ms[Math.floor(Math.random() * ms.length)];
 
   const res = await ai.models.generateContent({
