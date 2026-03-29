@@ -33,7 +33,9 @@ export async function POST(req: NextRequest) {
     }
   }
 
-  const ai = new GoogleGenAI({});
+  const ai = new GoogleGenAI({
+    apiKey:process.env.GEMINI_API_KEY || ""
+  });
 
   const res = await ai.models.generateContent({
       model: "gemini-3-flash-preview",
