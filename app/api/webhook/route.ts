@@ -1,8 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { GoogleGenAI } from "@google/genai";
 import { Client, WebhookEvent, MessageEvent } from '@line/bot-sdk';
+import { createClient } from '@supabase/supabase-js';
+import { timeStamp } from 'console';
+
 
 export async function POST(req: NextRequest) {
+  const supabase = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  );
+
   const body = await req.json();
   const events: WebhookEvent[] = body.events;
 
@@ -25,7 +33,8 @@ export async function POST(req: NextRequest) {
         texts.push({
           replyToken,
           userId:event.source.userId,
-          text:event.message.text
+          text:event.message.text,
+          timeStamp:event.timestamp
         });
       } catch (err) {
         console.error("Reply Error:", err);
@@ -47,6 +56,7 @@ export async function POST(req: NextRequest) {
 もし介入すべきでは無いなら最初に||はつけずにこんにちはと言って。
 介入して良い場合の回答例:||皆様の今後の更なるご発展を祈念しコメントとさせていただきたいと、斯様に思う次第であります。
 介入ダメな場合の回答例:こんにちは
+尚回答を考えるのに回答例の文言を参考にしたり真似たりはしなくてよい。
 
 会話履歴(古い順):"${JSON.stringify(events)}"
 `,
@@ -58,6 +68,18 @@ export async function POST(req: NextRequest) {
         type: 'text',
         text: rest.slice(2) || ""
     });
+  }
+  const foradd = texts.map(d=>({
+    user_id:d.userId,
+    content:d.text
+  }))
+  const { data, error } = await supabase
+    .from('messages2') // テーブル名
+    .insert(foradd)
+    .select(); // 挿入したデータを結果として受け取る
+
+  if (error) {
+    console.error('保存エラー:', error.message);
   }
 
   return NextResponse.json({ message: "OK" });
