@@ -49,21 +49,36 @@ export async function POST(req: NextRequest) {
 
   const { data: history, error: fetchError } = await supabase
     .from('messages')
-    .select('user_id, content')
+    .select('user_id, content, created_at')
     .eq('chat_id', texts[0].chatId)
     .order('created_at', { ascending: false })
     .limit(10);
 
-  const ai = new GoogleGenAI({
-    apiKey:process.env.GEMINI_API_KEY || ""
-  });
+  let yn = true;
 
-  const ms = ["gemini-2.5-flash-lite"];
-  const useModel = ms[Math.floor(Math.random() * ms.length)];
-  console.log(events[0].source.type)
-  const res = await ai.models.generateContent({
-      model: useModel,
-      contents: `
+  if (history && (history as any[]).length > 0) {
+    const lastCreatedAt = (history as any[])[0].created_at;
+    
+    const lastUnix = new Date(lastCreatedAt).getTime();
+    const nowUnix = Date.now();
+
+    if (nowUnix - lastUnix < 10000) {
+      console.log(`直近の議論から ${nowUnix - lastUnix}ms。拙速な回答は避けるべきであります。`);
+      yn = false;
+    }
+  }
+
+  if(yn){
+    const ai = new GoogleGenAI({
+      apiKey:process.env.GEMINI_API_KEY || ""
+    });
+
+    const ms = ["gemini-2.5-flash-lite"];
+    const useModel = ms[Math.floor(Math.random() * ms.length)];
+    console.log(events[0].source.type)
+    const res = await ai.models.generateContent({
+        model: useModel,
+        contents: `
 貴方は政治家:石破茂さんの様な堅苦しい言い方をするのが特徴であるline botです。
 今から古い順にlineの会話履歴を送るのでもし君の様なbotが
 介入して良いタイミング&介入して良い会話内容だと判断したら堅苦しい内容を30文字前後
@@ -76,16 +91,18 @@ ${events[0].source.type === "user" ? "尚これはlineグループではなく�
 
 過去の会話履歴(古い順):${JSON.stringify(history?.reverse())}
 新しい会話履歴(古い順):"${JSON.stringify(events)}"
-`,
-  });
-  
-  const rest = res.text;
-  if(rest?.slice(0,2) === "||"){
-    await client.replyMessage(texts?.at(-1)?.replyToken || "", {
-        type: 'text',
-        text: rest.slice(2) || ""
+  `,
     });
+    
+    const rest = res.text;
+    if(rest?.slice(0,2) === "||"){
+      await client.replyMessage(texts?.at(-1)?.replyToken || "", {
+          type: 'text',
+          text: rest.slice(2) || ""
+      });
+    }
   }
+  
   const foradd = texts.map(d=>({
     user_id:d.userId,
     content:d.text,
