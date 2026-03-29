@@ -71,7 +71,7 @@ export async function POST(req: NextRequest) {
 尚回答を考えるのに回答例の文言を参考にしたり真似たりはしなくてよい。
 ${events[0].source.type === "user" ? "尚これはlineグループではなく友達との会話だから介入すべきかの基準は下げていいよ":""}
 
-過去の会話履歴(古い順):${history?.reverse()}
+過去の会話履歴(古い順):${JSON.stringify(history?.reverse())}
 新しい会話履歴(古い順):"${JSON.stringify(events)}"
 `,
   });
