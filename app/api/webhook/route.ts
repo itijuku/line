@@ -42,7 +42,7 @@ export async function POST(req: NextRequest) {
   });
 
   const res = await ai.models.generateContent({
-      model: "gemini-1.5-flash",
+      model: "gemini-2.5-flash",
       contents: `
 貴方は政治家:石破茂さんの様な堅苦しい言い方をするのが特徴であるline botです。
 今から古い順にlineの会話履歴を送るのでもし君の様なbotが
