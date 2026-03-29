@@ -63,11 +63,11 @@ export async function POST(req: NextRequest) {
     const nowUnix = Date.now();
 
     if (nowUnix - lastUnix < 10000) {
+      yn = false;
       await client.replyMessage(texts?.at(-1)?.replyToken || "", {
           type: 'text',
           text: `直近の議論から ${nowUnix - lastUnix}ms。は避けるべきであります。`
       });
-      yn = false;
     }
   }
 
@@ -78,7 +78,7 @@ export async function POST(req: NextRequest) {
 
     const ms = ["gemini-2.5-flash-lite"];
     const useModel = ms[Math.floor(Math.random() * ms.length)];
-    console.log(events[0].source.type)
+
     const res = await ai.models.generateContent({
         model: useModel,
         contents: `
