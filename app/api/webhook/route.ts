@@ -60,7 +60,7 @@ export async function POST(req: NextRequest) {
 
   const ms = ["gemini-2.5-flash-lite"];
   const useModel = ms[Math.floor(Math.random() * ms.length)];
-
+  console.log(events[0].source.type)
   const res = await ai.models.generateContent({
       model: useModel,
       contents: `
