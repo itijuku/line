@@ -73,7 +73,7 @@ export async function POST(req: NextRequest) {
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
   );
   const { data, error } = await supabase
-    .from('messages2') // テーブル名
+    .from('mesagges2') // テーブル名
     .insert(foradd)
     .select(); // 挿入したデータを結果として受け取る
 
