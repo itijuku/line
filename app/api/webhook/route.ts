@@ -29,13 +29,30 @@ export async function POST(req: NextRequest) {
           replyToken,
           userId:event.source.userId,
           text:event.message.text,
-          timeStamp:event.timestamp
+          timeStamp:event.timestamp,
+          chatId:event.source.type === 'group' ? 
+            event.source.groupId :
+            event.source.type === 'room'  ? 
+            event.source.roomId :
+            event.source.userId
         });
       } catch (err) {
         console.error("Reply Error:", err);
       }
     }
   }
+
+  const supabase = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  );
+
+  const { data: history, error: fetchError } = await supabase
+    .from('messages')
+    .select('user_id, content')
+    .eq('chat_id', texts[0].chatId)
+    .order('created_at', { ascending: false })
+    .limit(10);
 
   const ai = new GoogleGenAI({
     apiKey:process.env.GEMINI_API_KEY || ""
@@ -52,8 +69,10 @@ export async function POST(req: NextRequest) {
 介入して良い場合の回答例:||皆様の今後の更なるご発展を祈念しコメントとさせていただきたいと、斯様に思う次第であります。
 介入ダメな場合の回答例:こんにちは
 尚回答を考えるのに回答例の文言を参考にしたり真似たりはしなくてよい。
+${events[0].source.type === "user" ? "尚これはlineグループではなく友達との会話だから介入すべきかの基準は下げていいよ":""}
 
-会話履歴(古い順):"${JSON.stringify(events)}"
+過去の会話履歴(古い順):${history?.reverse()}
+新しい会話履歴(古い順):"${JSON.stringify(events)}"
 `,
   });
   
@@ -66,12 +85,10 @@ export async function POST(req: NextRequest) {
   }
   const foradd = texts.map(d=>({
     user_id:d.userId,
-    content:d.text
+    content:d.text,
+    chat_id:d.chatId
   }))
-  const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-  );
+
   const { data, error } = await supabase
     .from('messages') // テーブル名
     .insert(foradd)
