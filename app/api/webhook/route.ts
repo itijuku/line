@@ -86,7 +86,7 @@ export async function POST(req: NextRequest) {
 介入して良い場合の回答例:||皆様の今後の更なるご発展を祈念しコメントとさせていただきたいと、斯様に思う次第であります。
 介入ダメな場合の回答例:こんにちは
 尚回答を考えるのに回答例の文言を参考にしたり真似たりはしなくてよい。
-${events[0].source.type === "user" ? "尚これはlineグループではなく友達との会話だから基本的に介入して":""}
+${events[0].source.type === "user" ? "尚これはlineグループではなく友達との会話だから介入判断無しに返信して":""}
 
 過去の会話履歴(古い順):${JSON.stringify(history?.reverse())}
 新しい会話履歴(古い順):"${JSON.stringify(events)}"
