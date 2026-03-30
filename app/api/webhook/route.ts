@@ -109,6 +109,14 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({ message: "Cooldown active" });
       }
     }
+  }else if(JSON.stringify(texts).length > 10000){
+    yn = false;
+    await client.replyMessage(texts?.at(-1)?.replyToken || "", {
+        type: 'text',
+        text: "文字数が多すぎます。可及的簡潔な議論を期待したく存じます"
+    });
+
+    return NextResponse.json({ message: "Cooldown active" });
   }
 
   if(yn){
