@@ -68,9 +68,9 @@ export async function POST(req: NextRequest) {
         yn = false;
         await client.replyMessage(texts?.at(-1)?.replyToken || "", {
             type: 'text',
-            text: `直近の議論から ${(nowUnix - lastUnix)/1000}秒。拙速な回答は避けるべきであります。`
+            text: `直近の議論から ${(10000 - (nowUnix - lastUnix))/1000}秒。拙速な回答は避けるべきであります。`
         });
-        sendText = `直近の議論から ${(nowUnix - lastUnix)/1000}秒。拙速な回答は避けるべきであります。`;
+        sendText = `直近の議論から ${(10000 - (nowUnix - lastUnix))/1000}秒。拙速な回答は避けるべきであります。`;
         console.log(`直近の議論から ${(nowUnix - lastUnix)/1000}秒。拙速な回答は避けるべきであります。`);
         return NextResponse.json({ message: "Cooldown active" });
       }
