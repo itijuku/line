@@ -72,11 +72,40 @@ export async function POST(req: NextRequest) {
         });
         sendText = `直近の議論から ${(10000 - (nowUnix - lastUnix))/1000}秒。拙速な回答は避けるべきであります。`;
         console.log(`直近の議論から ${(nowUnix - lastUnix)/1000}秒。拙速な回答は避けるべきであります。`);
+
+        const foradd = texts.map(d=>({
+          user_id:d.userId,
+          content:d.text,
+          chat_id:d.chatId,
+          me:"no"
+        }))
+        const { data, error } = await supabase
+          .from('messages') // テーブル名
+          .insert(foradd)
+          .select(); // 挿入したデータを結果として受け取る
+
+        if (error) {
+          console.error('保存エラー:', error.message);
+        }
         return NextResponse.json({ message: "Cooldown active" });
       }
     }else{
       if (nowUnix - lastUnix < 5000) {
         yn = false;
+        const foradd = texts.map(d=>({
+          user_id:d.userId,
+          content:d.text,
+          chat_id:d.chatId,
+          me:"no"
+        }))
+        const { data, error } = await supabase
+          .from('messages') // テーブル名
+          .insert(foradd)
+          .select(); // 挿入したデータを結果として受け取る
+
+        if (error) {
+          console.error('保存エラー:', error.message);
+        }
         return NextResponse.json({ message: "Cooldown active" });
       }
     }
