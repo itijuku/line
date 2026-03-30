@@ -155,7 +155,7 @@ ${events[0].source.type === "user" ? "尚これはlineグループではなく�
     me:"no"
   }))
 
-  if(yn){
+  if(yn && sendText?.slice(0,2) === "||"){
     foradd.push({
       user_id:"-",
       content:sendText.slice(2) || "",
