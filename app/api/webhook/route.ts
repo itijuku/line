@@ -55,6 +55,7 @@ export async function POST(req: NextRequest) {
     .limit(10);
 
   let yn = true;
+  let sendText = "";
 
   if (history && (history as any[]).length > 0) {
     const lastCreatedAt = (history as any[])[0].created_at;
@@ -62,14 +63,22 @@ export async function POST(req: NextRequest) {
     const lastUnix = new Date(lastCreatedAt).getTime();
     const nowUnix = Date.now();
 
-    if (nowUnix - lastUnix < 10000) {
-      yn = false;
-      await client.replyMessage(texts?.at(-1)?.replyToken || "", {
-          type: 'text',
-          text: `直近の議論から ${nowUnix - lastUnix}ms。拙速な回答は避けるべきであります。`
-      });
-      console.log(`直近の議論から ${nowUnix - lastUnix}ms。拙速な回答は避けるべきであります。`);
-      return NextResponse.json({ message: "Cooldown active" });
+    if(events[0].source.type === "user"){
+      if (nowUnix - lastUnix < 10000) {
+        yn = false;
+        await client.replyMessage(texts?.at(-1)?.replyToken || "", {
+            type: 'text',
+            text: `直近の議論から ${(nowUnix - lastUnix)/1000}秒。拙速な回答は避けるべきであります。`
+        });
+        sendText = `直近の議論から ${(nowUnix - lastUnix)/1000}秒。拙速な回答は避けるべきであります。`;
+        console.log(`直近の議論から ${(nowUnix - lastUnix)/1000}秒。拙速な回答は避けるべきであります。`);
+        return NextResponse.json({ message: "Cooldown active" });
+      }
+    }else{
+      if (nowUnix - lastUnix < 5000) {
+        yn = false;
+        return NextResponse.json({ message: "Cooldown active" });
+      }
     }
   }
 
@@ -96,10 +105,12 @@ ${events[0].source.type === "user" ? "尚これはlineグループではなく�
 
 過去の会話履歴(古い順):${JSON.stringify(history?.reverse())}
 新しい会話履歴(古い順):"${JSON.stringify(events)}"
+ちなみにuser_idが-なのは君自身の発言
 `,
     });
     
     const rest = res.text;
+    sendText = rest||"";
     if(rest?.slice(0,2) === "||"){
       await client.replyMessage(texts?.at(-1)?.replyToken || "", {
           type: 'text',
@@ -111,8 +122,18 @@ ${events[0].source.type === "user" ? "尚これはlineグループではなく�
   const foradd = texts.map(d=>({
     user_id:d.userId,
     content:d.text,
-    chat_id:d.chatId
+    chat_id:d.chatId,
+    me:"no"
   }))
+
+  if(yn){
+    foradd.push({
+      user_id:"-",
+      content:sendText.slice(2) || "",
+      chat_id:foradd[0].chat_id,
+      me:"yes"
+    })
+  }
 
   const { data, error } = await supabase
     .from('messages') // テーブル名
