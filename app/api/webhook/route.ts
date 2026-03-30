@@ -54,7 +54,7 @@ export async function POST(req: NextRequest) {
     .order('created_at', { ascending: false })
     .limit(10);
 
-  const yn = true;
+  let yn = true;
 
   if (history && (history as any[]).length > 0) {
     const lastCreatedAt = (history as any[])[0].created_at;
