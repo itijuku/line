@@ -49,7 +49,7 @@ export async function POST(req: NextRequest) {
 
   const { data: history, error: fetchError } = await supabase
     .from('messages')
-    .select('user_id, content, created_at')
+    .select('user_id, content, created_at, me')
     .eq('chat_id', texts[0].chatId)
     .order('created_at', { ascending: false })
     .limit(10);
