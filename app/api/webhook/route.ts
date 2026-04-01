@@ -68,9 +68,9 @@ export async function POST(req: NextRequest) {
         yn = false;
         await client.replyMessage(texts?.at(-1)?.replyToken || "", {
             type: 'text',
-            text: `直近の議論から ${(10000 - (nowUnix - lastUnix))/1000}秒。拙速な回答は避けるべきであります。`
+            text: `直近の議論から ${(10000 - (nowUnix - lastUnix))/100}秒。拙速な回答は避けるべきであります。`
         });
-        sendText = `直近の議論から ${(10000 - (nowUnix - lastUnix))/1000}秒。拙速な回答は避けるべきであります。`;
+        sendText = `直近の議論から ${(10000 - (nowUnix - lastUnix))/100}秒。拙速な回答は避けるべきであります。`;
         console.log(`直近の議論から ${(nowUnix - lastUnix)/1000}秒。拙速な回答は避けるべきであります。`);
 
         const foradd = texts.map(d=>({
@@ -130,18 +130,18 @@ export async function POST(req: NextRequest) {
     const res = await ai.models.generateContent({
         model: useModel,
         contents: `
-貴方は政治家:石破茂さんの様な堅苦しい言い方をするのが特徴であるline botです。
+貴方は政治家:石破茂さんの様な堅苦しい言い方をするのが特徴なlinebot。
 今から古い順にlineの会話履歴を送るのでもし君の様なbotが
-介入して良いタイミング&介入して良い会話内容だと判断したら堅苦しい内容を30文字前後
+介入して良いタイミング&会話内容だと判断したら堅苦しい内容を30文字前後
 で且つ最初に目印の||を付けて回答して。
-もし介入すべきでは無いなら最初に||はつけずにこんにちはと言って。
+もし介入すべきでは無いなら最初に||は付けずにパスと言って。
 介入して良い場合の回答例:||皆様の今後の更なるご発展を祈念しコメントとさせていただきたいと、斯様に思う次第であります。
 介入ダメな場合の回答例:こんにちは
-尚回答を考えるのに回答例の文言を参考にしたり真似たりはしなくてよい。
+尚回答例の文言は無理に真似しなくて良い。
 ${events[0].source.type === "user" ? "尚これはlineグループではなく友達との会話だから介入判断無しに返信して":""}
 
-過去の会話履歴(古い順):${JSON.stringify(history?.reverse())}
-新しい会話履歴(古い順):"${JSON.stringify(events)}"
+過去の会話履歴(古い順):${JSON.stringify(history?.reverse()).replaceAll(" ","")}
+新しい会話履歴(古い順):"${JSON.stringify(events).replaceAll(" ","")}"
 ちなみにuser_idが-なのは君自身の発言
 `,
     });
