@@ -52,7 +52,7 @@ export async function POST(req: NextRequest) {
     .select('user_id, content, created_at, me')
     .eq('chat_id', texts[0].chatId)
     .order('created_at', { ascending: false })
-    .limit(10);
+    .limit(15);
 
   let yn = true;
   let sendText = "";
@@ -109,7 +109,7 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({ message: "Cooldown active" });
       }
     }
-  }else if(JSON.stringify(texts).length > 10000){
+  }else if(JSON.stringify(texts).length > 500){
     yn = false;
     await client.replyMessage(texts?.at(-1)?.replyToken || "", {
         type: 'text',
